@@ -1,11 +1,18 @@
 $toolbar-width: 40px;
 
+// Overlay window: lock page scroll so only sidebars scroll
+body.bani-overlay-window {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
 .canvas {
   display: flex;
   height: 100vh;
   justify-content: center;
-  // margin-left: 120px;
   margin-right: 180px;
+  overflow: hidden;
 }
 
 .backdrop {
@@ -33,8 +40,13 @@ $toolbar-width: 40px;
 
 .control-panel {
   background: #eee;
+  flex-shrink: 0;
   height: 100vh;
   max-width: 320px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  // Match theme bar: independent vertical scroll, center stays fixed
+  -webkit-overflow-scrolling: touch;
 
   hr {
     border-top: 2px solid blue;
@@ -43,12 +55,13 @@ $toolbar-width: 40px;
 
 .preview-container {
   align-items: center;
-  align-self: flex-start;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  height: 100%;
+  height: 100vh;
   justify-content: center;
+  min-width: 0;
   overflow: hidden;
   text-align: center;
 
