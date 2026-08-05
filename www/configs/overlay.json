@@ -6,8 +6,9 @@
         "type": "title",
         "subcategories": [
           "gurbani-options",
-          "translation-options",
-          "transliteration-options",
+          "content1-options",
+          "content2-options",
+          "content3-options",
           "text-style-options",
           "text-format-options"
         ]
@@ -17,23 +18,20 @@
         "type": "dropdown",
         "settings": ["gurbani-text-color", "gurbani-font", "gurbani-size"]
       },
-      "translation-options": {
-        "title": "TRANSLATION",
+      "content1-options": {
+        "title": "CONTENT_1",
         "type": "dropdown",
-        "settings": [
-          "translation-language",
-          "translation-visibility",
-          "translation-size"
-        ]
+        "settings": ["content1", "content1-visibility", "content1-size"]
       },
-      "transliteration-options": {
-        "title": "TRANSLITERATION",
+      "content2-options": {
+        "title": "CONTENT_2",
         "type": "dropdown",
-        "settings": [
-          "transliteration-language",
-          "transliteration-visibility",
-          "transliteration-size"
-        ]
+        "settings": ["content2", "content2-visibility", "content2-size"]
+      },
+      "content3-options": {
+        "title": "CONTENT_3",
+        "type": "dropdown",
+        "settings": ["content3", "content3-visibility", "content3-size"]
       },
       "text-style-options": {
         "title": "TEXT",
@@ -66,7 +64,6 @@
         "type": "switch",
         "settings": ["overlayLarivaar", "larivaarAssist"]
       },
-     
 
       "date-time": {
         "title": "DATE_AND_TIME",
@@ -128,7 +125,7 @@
         "initialValue": true
       },
       "larivaarAssist": {
-        "title":"LARIVAAR_ASSIST",
+        "title": "LARIVAAR_ASSIST",
         "initialValue": false
       },
       "gurbani-size": {
@@ -140,22 +137,25 @@
         "step": 0.25,
         "disableOnChange": ["fit-text-switch"]
       },
-      "translation-language": {
+      "content1": {
         "title": "",
         "type": "dropdown",
         "options": {
-          "English": "English",
-          "Hindi": "Hindi",
-          "Spanish": "Spanish"
+          "translation-english": "Translation - English",
+          "translation-hindi": "Translation - Hindi",
+          "translation-spanish": "Translation - Spanish",
+          "transliteration-english": "Transliteration - English",
+          "transliteration-hindi": "Transliteration - Hindi",
+          "teeka-punjabi": "Teeka - Punjabi"
         },
-        "initialValue": "English"
+        "initialValue": "translation-english"
       },
-      "translation-visibility": {
+      "content1-visibility": {
         "title": "SHOW",
         "type": "switch",
         "initialValue": true
       },
-      "translation-size": {
+      "content1-size": {
         "title": "",
         "type": "size-icon",
         "initialValue": 3,
@@ -164,21 +164,52 @@
         "step": 0.25,
         "disableOnChange": ["fit-text-switch"]
       },
-      "transliteration-language": {
+      "content2": {
         "title": "",
         "type": "dropdown",
         "options": {
-          "English": "English",
-          "Hindi": "Hindi"
+          "translation-english": "Translation - English",
+          "translation-hindi": "Translation - Hindi",
+          "translation-spanish": "Translation - Spanish",
+          "transliteration-english": "Transliteration - English",
+          "transliteration-hindi": "Transliteration - Hindi",
+          "teeka-punjabi": "Teeka - Punjabi"
         },
-        "initialValue": "English"
+        "initialValue": "transliteration-english"
       },
-      "transliteration-visibility": {
+      "content2-visibility": {
         "title": "SHOW",
         "type": "switch",
         "initialValue": true
       },
-      "transliteration-size": {
+      "content2-size": {
+        "title": "",
+        "type": "size-icon",
+        "initialValue": 3,
+        "max": 14,
+        "min": 1,
+        "step": 0.25,
+        "disableOnChange": ["fit-text-switch"]
+      },
+      "content3": {
+        "title": "",
+        "type": "dropdown",
+        "options": {
+          "translation-english": "Translation - English",
+          "translation-hindi": "Translation - Hindi",
+          "translation-spanish": "Translation - Spanish",
+          "transliteration-english": "Transliteration - English",
+          "transliteration-hindi": "Transliteration - Hindi",
+          "teeka-punjabi": "Teeka - Punjabi"
+        },
+        "initialValue": "teeka-punjabi"
+      },
+      "content3-visibility": {
+        "title": "SHOW",
+        "type": "switch",
+        "initialValue": false
+      },
+      "content3-size": {
         "title": "",
         "type": "size-icon",
         "initialValue": 3,
@@ -221,10 +252,10 @@
         "initialValue": "#97d6f7"
       },
       "padding": {
-        "title": "HEIGHT",
+        "title": "PADDING",
         "initialValue": 0.5,
-        "max": 5,
-        "min": 0.5,
+        "max": 8,
+        "min": 0,
         "step": 0.1,
         "disableOnChange": ["fit-text-switch"]
       },

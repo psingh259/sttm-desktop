@@ -14,14 +14,14 @@ const SettingsFactory = ({ subCategory }) => {
   const baniOverlayState = useStoreState((state) => state.baniOverlay);
   const showFitTextOptions = ['top', 'bottom'].includes(baniOverlayState.layout);
 
-  Object.keys(subCategory.settingObjs).forEach((settingKey, settingIndex) => {
+  Object.keys(subCategory.settingObjs).forEach((settingKey) => {
     if (settingKey === 'fit-text-switch' && !showFitTextOptions) {
       return;
     }
     settingsDOM.push(
       <div
         className={`control-item control-${subCategory.settingObjs[settingKey].type}`}
-        key={`factory-${settingIndex}`}
+        key={settingKey}
         id={settingKey}
       >
         <OverlaySetting

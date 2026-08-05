@@ -77,12 +77,15 @@ body {
   font-family: 'Noto Sans';
 }
 
+.o-content-slot,
 .o-transliteration,
 .o-translation {
   display: inline-block;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+.o-content-slot.hindi,
+.o-content-slot.devanagari,
 .o-translation.hindi,
 .o-transliteration.devanagari {
   font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'ITF Devanagari', 'Nirmala UI',
@@ -93,6 +96,7 @@ body {
   text-transform: none;
 }
 
+.o-content-slot.shahmukhi,
 .o-transliteration.shahmukhi {
   font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Geeza Pro', 'Segoe UI', 'Arial',
     sans-serif;
@@ -102,22 +106,14 @@ body {
   text-transform: none;
 }
 
-.o-transliteration,
-.o-teeka {
-  display: none;
-}
-
-.o-translation:empty,
-.o-transliteration:empty,
-.o-teeka:empty {
+.o-content-slot:empty {
   display: none !important;
   padding: 0 !important;
 }
 
 .layout-top {
   .o-gurbani,
-  .o-translation,
-  .o-transliteration {
+  .o-content-slot {
     padding: 0.5% 3vw;
   }
 
@@ -133,8 +129,7 @@ body {
   }
 
   .o-gurbani,
-  .o-translation,
-  .o-transliteration {
+  .o-content-slot {
     padding: 0.5% 3vw;
   }
 
@@ -161,7 +156,7 @@ body {
   }
 
   .o-gurbani,
-  .o-translation {
+  .o-content-slot {
     background: rgba(0, 0, 0, 0.8);
     margin: 0;
     padding: 5px;
@@ -169,11 +164,6 @@ body {
     &:empty {
       display: none;
     }
-  }
-
-  .o-teeka,
-  .o-transliteration {
-    display: none;
   }
 }
 
@@ -210,8 +200,7 @@ body {
     }
   }
 
-  .o-teeka,
-  .o-transliteration {
+  .o-content-slot {
     display: block;
   }
 }
@@ -245,8 +234,7 @@ body {
     padding-bottom: 3vh;
   }
 
-  .o-teeka,
-  .o-transliteration {
+  .o-content-slot {
     display: block;
   }
 
@@ -313,7 +301,7 @@ body {
   }
 
   .content-bar {
-    padding: 1vh 5vw;
+    padding: 0.75vh 0;
   }
 
   .o-gurbani {
@@ -322,9 +310,7 @@ body {
     text-align: center;
   }
 
-  .o-teeka,
-  .o-transliteration,
-  .o-translation {
+  .o-content-slot {
     display: block;
     line-height: 1.4;
     text-align: center;
@@ -347,10 +333,8 @@ body {
 .content-bottom {
   &.never-forget {
     color: #f00;
-    .o-translation,
-    .o-teeka,
-    .o-gurbani,
-    .o-transliteration {
+    .o-content-slot,
+    .o-gurbani {
       color: #f00;
     }
   }
@@ -358,10 +342,8 @@ body {
   &.khalsa-gold {
     color: #ffba00;
 
-    .o-translation,
-    .o-teeka,
-    .o-gurbani,
-    .o-transliteration {
+    .o-content-slot,
+    .o-gurbani {
       color: #ffba00;
     }
   }
@@ -369,13 +351,12 @@ body {
   &.baagi-blue {
     color: #fff;
 
-    .o-translation,
-    .o-teeka,
+    .o-content-slot,
     .o-gurbani {
       color: #fff;
     }
 
-    .o-transliteration {
+    .o-content-slot.o-transliteration {
       color: #a0d5fe;
     }
   }
@@ -383,10 +364,8 @@ body {
   &.khalsa-rush {
     color: #071f77;
 
-    .o-translation,
-    .o-teeka,
-    .o-gurbani,
-    .o-transliteration {
+    .o-content-slot,
+    .o-gurbani {
       color: #071f77;
     }
   }
@@ -394,10 +373,8 @@ body {
   &.moody-blue {
     color: #fff;
 
-    .o-translation,
-    .o-teeka,
-    .o-gurbani,
-    .o-transliteration {
+    .o-content-slot,
+    .o-gurbani {
       color: #fff;
     }
   }
@@ -405,12 +382,12 @@ body {
   &.a-new-day {
     color: #0e2654;
 
-    .o-translation,
-    .o-teeka {
+    .o-content-slot.o-translation,
+    .o-content-slot.o-teeka {
       color: #003a8c;
     }
     .o-gurbani,
-    .o-transliteration {
+    .o-content-slot.o-transliteration {
       color: #0e2654;
     }
   }
@@ -419,12 +396,12 @@ body {
     color: #fff;
 
     .o-gurbani,
-    .o-transliteration {
+    .o-content-slot.o-transliteration {
       color: #fff;
     }
 
-    .o-teeka,
-    .o-translation {
+    .o-content-slot.o-teeka,
+    .o-content-slot.o-translation {
       color: #a3eafd;
     }
   }
@@ -433,12 +410,12 @@ body {
     color: #460a1e;
 
     .o-gurbani,
-    .o-transliteration {
+    .o-content-slot.o-transliteration {
       color: #460a1e;
     }
 
-    .o-teeka,
-    .o-translation {
+    .o-content-slot.o-teeka,
+    .o-content-slot.o-translation {
       color: #821d3e;
     }
   }
