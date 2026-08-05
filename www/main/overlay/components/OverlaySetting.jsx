@@ -23,27 +23,34 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   const handleSizeIcon = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    const { max, min, step } = settingObj;
+    const max = Number(settingObj.max);
+    const min = Number(settingObj.min);
+    const step = Number(settingObj.step) || 0.1;
     const value = event.currentTarget ? event.currentTarget.dataset.value : event;
     const currentValue = Number(baniOverlayState[stateVar]);
+    if (Number.isNaN(currentValue) || Number.isNaN(max) || Number.isNaN(min)) {
+      return;
+    }
     let updatedValue;
 
     if (value === 'plus' && currentValue < max) {
-      updatedValue = currentValue + step;
-      baniOverlayActions[stateFunction](updatedValue);
+      updatedValue = Math.min(max, Math.round((currentValue + step) * 1000) / 1000);
     } else if (value === 'minus' && currentValue > min) {
-      updatedValue = currentValue - step;
-      baniOverlayActions[stateFunction](updatedValue);
+      updatedValue = Math.max(min, Math.round((currentValue - step) * 1000) / 1000);
     }
 
-    if (updatedValue !== undefined && settingObj?.disableOnChange?.length > 0) {
-      settingObj.disableOnChange.forEach((disableSetting) => {
-        const disabledSetting = convertToCamelCase(disableSetting);
-        const setDisabledSetting = `set${convertToCamelCase(disableSetting, true)}`;
-        if (baniOverlayState[disabledSetting] !== false) {
-          baniOverlayActions[setDisabledSetting](false);
-        }
-      });
+    if (updatedValue !== undefined && updatedValue !== currentValue) {
+      baniOverlayActions[stateFunction](updatedValue);
+
+      if (settingObj?.disableOnChange?.length > 0) {
+        settingObj.disableOnChange.forEach((disableSetting) => {
+          const disabledSetting = convertToCamelCase(disableSetting);
+          const setDisabledSetting = `set${convertToCamelCase(disableSetting, true)}`;
+          if (baniOverlayState[disabledSetting] !== false) {
+            baniOverlayActions[setDisabledSetting](false);
+          }
+        });
+      }
     }
   };
 

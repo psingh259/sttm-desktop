@@ -73,8 +73,9 @@ body {
   font-family: 'Noto Sans Bold';
 }
 
-.o-teeka {
-  font-family: 'Noto Sans';
+.o-teeka,
+.o-content-slot.o-teeka {
+  font-family: 'Gurbani Akhar', 'Anmol Lipi', 'Noto Sans', sans-serif;
 }
 
 .o-content-slot,

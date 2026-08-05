@@ -138,13 +138,14 @@
     };
 
     const getContentMeta = (contentId) => {
-      if (!contentId) return { typeClass: '', scriptClass: '', lang: 'en' };
+      if (!contentId) return { typeClass: '', scriptClass: '', lang: 'en', useGurmukhiFont: false };
       if (contentId.startsWith('translation-')) {
         const lang = contentId.replace('translation-', '');
         return {
           typeClass: 'o-translation',
           scriptClass: lang === 'hindi' ? 'hindi' : lang === 'spanish' ? 'spanish' : '',
           lang: lang === 'hindi' ? 'hi' : lang === 'spanish' ? 'es' : 'en',
+          useGurmukhiFont: false,
         };
       }
       if (contentId.startsWith('transliteration-')) {
@@ -153,16 +154,27 @@
           typeClass: 'o-transliteration',
           scriptClass: lang === 'hindi' ? 'devanagari' : lang === 'punjabi' ? 'shahmukhi' : '',
           lang: lang === 'hindi' ? 'hi' : lang === 'punjabi' ? 'pa-Arab' : 'en',
+          useGurmukhiFont: false,
         };
       }
       if (contentId.startsWith('teeka-')) {
-        return { typeClass: 'o-teeka', scriptClass: '', lang: 'pa' };
+        // Teeka is ASCII-encoded Gurmukhi — needs a Gurmukhi font face
+        return {
+          typeClass: 'o-teeka',
+          scriptClass: 'gurmukhi',
+          lang: 'pa',
+          useGurmukhiFont: true,
+        };
       }
-      return { typeClass: '', scriptClass: '', lang: 'en' };
+      return { typeClass: '', scriptClass: '', lang: 'en', useGurmukhiFont: false };
     };
 
     const renderContentSlots = (Line) => {
       const slots = getContentSlots();
+      const gurbaniFont =
+        (overlayPrefs && overlayPrefs.gurbaniFont) || 'Gurbani Akhar';
+      const textFont = (overlayPrefs && overlayPrefs.textFont) || 'Muli';
+
       document.querySelectorAll('.o-content-slot').forEach((slotEl) => {
         const index = Number(slotEl.dataset.slot) - 1;
         const slot = slots[index] || slots[0];
@@ -171,10 +183,19 @@
 
         slotEl.className = `o-content-slot ${meta.typeClass} ${meta.scriptClass}`.trim();
         slotEl.dataset.content = slot.content || '';
+        slotEl.dataset.useGurmukhi = meta.useGurmukhiFont ? '1' : '0';
         slotEl.setAttribute('lang', meta.lang);
         slotEl.innerHTML = text;
         slotEl.style.display = slot.visible && text ? '' : 'none';
         slotEl.style.fontSize = `${slot.size}vh`;
+
+        if (meta.useGurmukhiFont) {
+          slotEl.style.fontFamily = gurbaniFont;
+        } else if (meta.scriptClass === 'hindi' || meta.scriptClass === 'devanagari') {
+          slotEl.style.fontFamily = '';
+        } else {
+          slotEl.style.fontFamily = textFont;
+        }
       });
     };
 
@@ -305,9 +326,13 @@
       const { gurbaniFont, textFont, toggleAnnouncement } = overlayPrefs;
       getElements('.o-gurbani').setProperty('fontFamily', gurbaniFont);
       document.querySelectorAll('.o-content-slot').forEach((el) => {
-        const isDevanagari =
-          el.classList.contains('hindi') || el.classList.contains('devanagari');
-        el.style.fontFamily = isDevanagari ? '' : textFont;
+        if (el.dataset.useGurmukhi === '1' || el.classList.contains('o-teeka')) {
+          el.style.fontFamily = gurbaniFont || 'Gurbani Akhar';
+        } else if (el.classList.contains('hindi') || el.classList.contains('devanagari')) {
+          el.style.fontFamily = '';
+        } else {
+          el.style.fontFamily = textFont;
+        }
       });
 
       document.body.classList.add('layout-' + layout);
@@ -375,6 +400,20 @@
           content.style.padding = '0';
         });
       });
+
+      // Re-apply padding last so layout-specific overrides don't drop it
+      // (except classic/vertical which use padding differently above)
+      if (['top', 'bottom'].includes(layout)) {
+        layoutContainer.style.padding = paddingValue;
+      } else if (layout === 'split') {
+        document.querySelectorAll('.content-top, .content-bottom').forEach((el) => {
+          el.style.padding = paddingValue;
+        });
+      } else if (layout === 'fullscreen') {
+        document.querySelectorAll('.layout-fullscreen .overlay-wrapper').forEach((el) => {
+          el.style.padding = `${overlayPrefs.padding != null ? overlayPrefs.padding : 0.5}vh 4vw`;
+        });
+      }
 
       document.body.style.backgroundColor = overlayColor;
 
