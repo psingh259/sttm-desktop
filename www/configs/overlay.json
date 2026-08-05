@@ -51,7 +51,17 @@
       "background-options": {
         "title": "",
         "type": "size-icon",
-        "settings": ["bg-color", "padding", "bg-opacity", "overlay-theme"]
+        "settings": ["bg-color", "bg-opacity", "overlay-theme"]
+      },
+      "spacing": {
+        "title": "SPACING",
+        "type": "title",
+        "subcategories": ["spacing-options"]
+      },
+      "spacing-options": {
+        "title": "",
+        "type": "size-icon",
+        "settings": ["padding-horizontal", "padding-vertical", "line-spacing"]
       },
 
       "larivaar-title": {
@@ -253,9 +263,35 @@
       },
       "padding": {
         "title": "PADDING",
-        "type": "size-icon",
+        "type": "hidden",
         "initialValue": 0.5,
         "max": 8,
+        "min": 0,
+        "step": 0.1
+      },
+      "padding-horizontal": {
+        "title": "PADDING_HORIZONTAL",
+        "type": "size-icon",
+        "initialValue": 5,
+        "max": 20,
+        "min": 0,
+        "step": 0.5,
+        "disableOnChange": ["fit-text-switch"]
+      },
+      "padding-vertical": {
+        "title": "PADDING_VERTICAL",
+        "type": "size-icon",
+        "initialValue": 0.5,
+        "max": 10,
+        "min": 0,
+        "step": 0.1,
+        "disableOnChange": ["fit-text-switch"]
+      },
+      "line-spacing": {
+        "title": "LINE_SPACING",
+        "type": "size-icon",
+        "initialValue": 0.5,
+        "max": 5,
         "min": 0,
         "step": 0.1,
         "disableOnChange": ["fit-text-switch"]

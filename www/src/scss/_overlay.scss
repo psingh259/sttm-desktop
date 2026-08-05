@@ -629,7 +629,18 @@ button.layout-btn {
         }
       }
       &.control-size-icon {
-        text-align: center;
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        margin: 6px 0;
+        text-align: left;
+        width: 100%;
+
+        > span:first-child {
+          flex: 1;
+          min-width: 0;
+        }
       }
 
       &:first-child(),
