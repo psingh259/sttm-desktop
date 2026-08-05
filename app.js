@@ -473,11 +473,21 @@ function createBroadcastFiles(arg) {
 
 let seq = Math.floor(Math.random() * 100);
 
+// Keep last live overlay prefs so socket reconnects don't reset layout/language
+// from a stale main-window snapshot.
+let lastOverlayPrefs = null;
+
 const showLine = async (line, socket = io) => {
   const lineWithSettings = line;
   lineWithSettings.languageSettings = {
-    translation: savedSettings.translationLanguage,
-    transliteration: savedSettings.transliterationLanguage,
+    translation:
+      (lastOverlayPrefs && lastOverlayPrefs.translationLanguage) ||
+      savedSettings.translationLanguage ||
+      'English',
+    transliteration:
+      (lastOverlayPrefs && lastOverlayPrefs.transliterationLanguage) ||
+      savedSettings.transliterationLanguage ||
+      'English',
   };
 
   const payload = lineWithSettings;
@@ -501,8 +511,33 @@ const showLine = async (line, socket = io) => {
 
 const updateOverlayVars = (overlayPrefs) => {
   if (overlayPrefs) {
-    io.emit('update-prefs', overlayPrefs);
-  } else {
+    const prev = lastOverlayPrefs || {};
+    // Strip internal flags before merge / broadcast
+    const { __fullSnapshot, ...incoming } = overlayPrefs;
+    const incomingKeys = Object.keys(incoming);
+    const isFullSnapshot = __fullSnapshot === true || incomingKeys.length > 5;
+    const prevLayout = prev.layout;
+    const incomingLayout = incoming.layout;
+
+    if (isFullSnapshot && lastOverlayPrefs) {
+      // Full snapshots after init must not clobber live layout choice.
+      // Size/language/etc. can still update; layout stays sticky.
+      const { layout: _ignoredLayout, ...rest } = incoming;
+      lastOverlayPrefs = {
+        ...lastOverlayPrefs,
+        ...rest,
+        layout: prevLayout || incomingLayout || lastOverlayPrefs.layout,
+      };
+    } else {
+      // Delta (e.g. { layout: 'fullscreen' } or { translationSize: 2.5 })
+      // or first full snapshot when no live prefs yet
+      lastOverlayPrefs = { ...prev, ...incoming };
+    }
+
+    io.emit('update-prefs', lastOverlayPrefs);
+  } else if (lastOverlayPrefs) {
+    io.emit('update-prefs', lastOverlayPrefs);
+  } else if (mainWindow) {
     mainWindow.webContents.send('get-overlay-prefs');
   }
 };

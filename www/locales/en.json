@@ -20,6 +20,9 @@
   "BANI_OVERLAY": {
     "SUBTITLES": "Subtitles",
     "GURBANI": "Gurbani",
+    "TRANSLATION": "Translation",
+    "TRANSLITERATION": "Transliteration",
+    "SHOW": "Show",
     "TEXT": "Text",
     "TEXT_FORMAT": "Text Formatting",
     "BACKGROUND": "Background",

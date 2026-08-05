@@ -83,14 +83,41 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+.o-translation.hindi,
+.o-transliteration.devanagari {
+  font-family: 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'ITF Devanagari', 'Nirmala UI',
+    'Mangal', 'Devanagari Sangam MN', sans-serif;
+  font-synthesis: none;
+  font-weight: normal;
+  line-height: 1.5;
+  text-transform: none;
+}
+
+.o-transliteration.shahmukhi {
+  font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Geeza Pro', 'Segoe UI', 'Arial',
+    sans-serif;
+  font-synthesis: none;
+  font-weight: normal;
+  line-height: 1.6;
+  text-transform: none;
+}
+
 .o-transliteration,
 .o-teeka {
   display: none;
 }
 
+.o-translation:empty,
+.o-transliteration:empty,
+.o-teeka:empty {
+  display: none !important;
+  padding: 0 !important;
+}
+
 .layout-top {
   .o-gurbani,
-  .o-translation {
+  .o-translation,
+  .o-transliteration {
     padding: 0.5% 3vw;
   }
 
@@ -106,7 +133,8 @@ body {
   }
 
   .o-gurbani,
-  .o-translation {
+  .o-translation,
+  .o-transliteration {
     padding: 0.5% 3vw;
   }
 
@@ -231,6 +259,82 @@ body {
     height: 100%;
     position: absolute;
     right: 0;
+
+    .sttm-logo-white {
+      display: block;
+      margin: auto;
+    }
+  }
+}
+
+// Viewer-like full screen layout
+.layout-fullscreen {
+  .overlay-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+
+  .other-layouts {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .content-top,
+  .content-bottom,
+  .content-bars-bottom {
+    background: transparent;
+    position: static;
+    width: 100%;
+  }
+
+  .content-top {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .content-bars-bottom {
+    padding-right: 0;
+  }
+
+  .content-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .content-bar {
+    padding: 1vh 5vw;
+  }
+
+  .o-gurbani {
+    display: block;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .o-teeka,
+  .o-transliteration,
+  .o-translation {
+    display: block;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .logo-wrapper {
+    bottom: 2vh;
+    height: auto;
+    position: fixed;
+    right: 2vh;
 
     .sttm-logo-white {
       display: block;

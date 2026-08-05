@@ -28,6 +28,7 @@
 
     const previewData = {
       English: 'If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||',
+      Hindi: 'यदि प्रभु अपनी कृपा करे, तो मैं उसे अपने हृदय में बसा रखूँ। ||1||',
       Gurmukhi: 'ik®pw kry jy AwpxI qw hir rKw aur Dwir ]1]',
       PageNo: 589,
       Punjabi: 'jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[',
@@ -42,7 +43,7 @@
       },
       Spanish: 'Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)',
       Translations:
-        '{"en":{"bdb":"If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||"},"pu":{"ss":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[","ft":"jy hrI ApnI ikRpw kry qW mYN iqs hir ky nwm ko aur myN Dwrn kr rKW]1]","bdb":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1["},"puu":{"ss":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।","ft":"ਜੇ ਹਰੀ ਅਪਨੀ ਕ੍ਰਿਪਾ ਕਰੇ ਤਾਂ ਮੈਂ ਤਿਸ ਹਰਿ ਕੇ ਨਾਮ ਕੋ ਉਰ ਮੇਂ ਧਾਰਨ ਕਰ ਰਖਾਂ॥੧॥","bdb":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।"},"es":{"sn":"Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)"}}',
+        '{"en":{"bdb":"If the Lord shows His Mercy, then I keep Him enshrined within my heart. ||1||"},"pu":{"ss":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1[","ft":"jy hrI ApnI ikRpw kry qW mYN iqs hir ky nwm ko aur myN Dwrn kr rKW]1]","bdb":"jy prmwqmw AwpxI myhr kry, qW mYN BI aus dw nwm ihrdy ivc pro r`KW [1["},"puu":{"ss":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।","ft":"ਜੇ ਹਰੀ ਅਪਨੀ ਕ੍ਰਿਪਾ ਕਰੇ ਤਾਂ ਮੈਂ ਤਿਸ ਹਰਿ ਕੇ ਨਾਮ ਕੋ ਉਰ ਮੇਂ ਧਾਰਨ ਕਰ ਰਖਾਂ॥੧॥","bdb":"ਜੇ ਪਰਮਾਤਮਾ ਆਪਣੀ ਮੇਹਰ ਕਰੇ, ਤਾਂ ਮੈਂ ਭੀ ਉਸ ਦਾ ਨਾਮ ਹਿਰਦੇ ਵਿਚ ਪਰੋ ਰੱਖਾਂ ।੧।"},"es":{"sn":"Cuando el Señor así nos bendice, enaltecemos al Guru en la mente. (1)"},"hi":{"ss":"यदि प्रभु अपनी कृपा करे, तो मैं उसे अपने हृदय में बसा रखूँ। ||1||"}}',
       Transliteration: {
         Devanagari: 'कृपा करे जे आपणी ता हरि रखा उर धारि ॥१॥',
         English: 'kirapaa kare je aapanee taa har rakhaa ur dhaar ||1||',
@@ -86,27 +87,73 @@
         .join(overlayLarivaar ? '' : ' ');
     };
 
+    const mapTransliterationKey = (language) => {
+      if (language === 'Hindi' || language === 'Devanagari') {
+        return 'Devanagari';
+      }
+      if (language === 'Shahmukhi' || language === 'Punjabi') {
+        return 'Shahmukhi';
+      }
+      return 'English';
+    };
+
+    const getLanguageSettings = (languageSettings) => {
+      // Overlay UI prefs always win over legacy languageSettings from app.js
+      const translation =
+        (overlayPrefs && overlayPrefs.translationLanguage) ||
+        (languageSettings && languageSettings.translation) ||
+        'English';
+      const transliterationLang =
+        (overlayPrefs && overlayPrefs.transliterationLanguage) ||
+        (languageSettings && languageSettings.transliteration) ||
+        'English';
+      return {
+        translation,
+        transliteration: mapTransliterationKey(transliterationLang),
+      };
+    };
+
+    const getTranslationText = (Line, translationLang) => {
+      if (!Line) return '';
+      if (translationLang === 'Hindi') {
+        return Line.Hindi || Line.hindi || '';
+      }
+      if (translationLang === 'Spanish') {
+        return Line.Spanish || Line.spanish || '';
+      }
+      return Line.English || Line.english || '';
+    };
+
+    const getTransliterationText = (Line, transliterationKey) => {
+      if (!Line || !Line.Transliteration) return '';
+      if (typeof Line.Transliteration === 'string') {
+        return transliterationKey === 'English' ? Line.Transliteration : '';
+      }
+      return (
+        Line.Transliteration[transliterationKey] ||
+        Line.Transliteration[transliterationKey.toLowerCase()] ||
+        ''
+      );
+    };
+
     const writeLine = (Line, larivaar, larivaarAssist, languageSettings) => {
       lineBeforeAnnouncement = { Line, larivaar, larivaarAssist, languageSettings };
       getElements('.o-gurbani').setProperty('innerHTML',
-        assist(Line.Gurmukhi, larivaar, larivaarAssist));
+        assist(Line.Gurmukhi || '', larivaar, larivaarAssist));
 
-      let translation = '';
-      let transliteration = '';
-      if (languageSettings) {
-        translation = Line[languageSettings.translation] || '';
-        transliteration = Line.Transliteration[languageSettings.transliteration] || '';
-      } else {
-        translation = Line.English || '';
-        transliteration = Line.Transliteration['English'] || '';
-      }
+      const resolvedLanguage = getLanguageSettings(languageSettings);
+      const translation = getTranslationText(Line, resolvedLanguage.translation);
+      const transliteration = getTransliterationText(Line, resolvedLanguage.transliteration);
 
       getElements('.o-translation').setProperty('innerHTML', translation);
       getElements('.o-teeka').setProperty('innerHTML', Line.Punjabi || '');
       getElements('.o-transliteration').setProperty('innerHTML', transliteration);
 
+      applyContentLanguageClasses(resolvedLanguage);
+      applyContentVisibility();
+
       document.querySelector('.overlay-wrapper').hidden =
-        Line.Gurmukhi === '' && Line.English === '';
+        Line.Gurmukhi === '' && !translation;
     };
 
     const writeText = (text, isGurmukhi, isAnnouncement) => {
@@ -120,33 +167,124 @@
         getElements('.o-gurbani').setProperty('innerHTML', htmlCode);
         getElements('.o-translation').setProperty('innerHTML', '');
       }
-      document.querySelector('.o-teeka').innerHTML = '';
-      document.querySelector('.o-transliteration').innerHTML = '';
+      document.querySelectorAll('.o-teeka').forEach(el => {
+        el.innerHTML = '';
+      });
+      document.querySelectorAll('.o-transliteration').forEach(el => {
+        el.innerHTML = '';
+      });
+    };
+
+    const applyContentLanguageClasses = (resolvedLanguage) => {
+      const translationLang = (resolvedLanguage && resolvedLanguage.translation) || 'English';
+      const transliterationKey =
+        (resolvedLanguage && resolvedLanguage.transliteration) || 'English';
+
+      document.querySelectorAll('.o-translation').forEach(el => {
+        el.classList.toggle('hindi', translationLang === 'Hindi');
+        el.classList.toggle('spanish', translationLang === 'Spanish');
+        if (translationLang === 'Hindi') {
+          el.setAttribute('lang', 'hi');
+        } else if (translationLang === 'Spanish') {
+          el.setAttribute('lang', 'es');
+        } else {
+          el.setAttribute('lang', 'en');
+        }
+      });
+
+      document.querySelectorAll('.o-transliteration').forEach(el => {
+        el.classList.toggle('devanagari', transliterationKey === 'Devanagari');
+        el.classList.toggle('shahmukhi', transliterationKey === 'Shahmukhi');
+        if (transliterationKey === 'Devanagari') {
+          el.setAttribute('lang', 'hi');
+        } else if (transliterationKey === 'Shahmukhi') {
+          el.setAttribute('lang', 'pa-Arab');
+        } else {
+          el.setAttribute('lang', 'en');
+        }
+      });
+    };
+
+    const applyContentVisibility = () => {
+      if (!overlayPrefs) {
+        return;
+      }
+
+      const showTranslation = overlayPrefs.translationVisibility !== false;
+      const showTransliteration = overlayPrefs.transliterationVisibility !== false;
+      const layout = overlayPrefs.layout || 'split';
+      const alwaysAllowTranslit = ['split', 'vertical', 'vertical-left', 'fullscreen'].includes(
+        layout,
+      );
+
+      document.querySelectorAll('.o-translation').forEach(el => {
+        el.style.display = showTranslation ? '' : 'none';
+      });
+
+      document.querySelectorAll('.o-transliteration').forEach(el => {
+        // Keep layout defaults for classic/top/bottom unless visibility is on and content exists
+        if (!showTransliteration) {
+          el.style.display = 'none';
+        } else if (alwaysAllowTranslit || layout === 'top' || layout === 'bottom') {
+          el.style.display = el.innerHTML ? 'block' : 'none';
+        } else {
+          el.style.display = '';
+        }
+      });
+    };
+
+    const getTextSize = (sizeKey, fallback = 3) => {
+      if (!overlayPrefs) {
+        return fallback;
+      }
+      if (preview && overlayPrefs.fitTextSwitch) {
+        return fallback;
+      }
+      const size = overlayPrefs[sizeKey];
+      if (size !== undefined && size !== null) {
+        return size;
+      }
+      return overlayPrefs.textSize || fallback;
     };
 
     const applyOverlayPrefs = () => {
+      if (!overlayPrefs) {
+        return;
+      }
+      const layout = overlayPrefs.layout || 'split';
       const overlayColor = overlayPrefs.greenScreenToggle ? '#0f0' : 'transparent';
       const bgOpacity = Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity;
+      const translationSize = getTextSize('translationSize', 3);
+      const transliterationSize = getTextSize('transliterationSize', 3);
 
       const layoutContainer = document.querySelector('.layout-top-bottom');
       layoutContainer.style.color = overlayPrefs.textColor;
-      layoutContainer.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
+      layoutContainer.style.fontSize = `${translationSize}vh`;
       layoutContainer.style.padding = `${overlayPrefs.fitTextSwitch ? '1vh 5%' : `${overlayPrefs.padding}vh 5%`}`;
       layoutContainer.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
 
       document.querySelectorAll('.content-top, .content-bottom').forEach(el => {
         el.style.color = overlayPrefs.textColor;
-        el.style.fontSize = `${(preview && overlayPrefs.fitTextSwitch) ? 3 : overlayPrefs.textSize}vh`;
+        el.style.fontSize = `${translationSize}vh`;
         el.style.padding = `${overlayPrefs.fitTextSwitch ? '1vh 5%' : `${overlayPrefs.padding}vh 5%`}`;
         el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
       });
 
-      document.querySelector('.logo-wrapper').style.opacity = overlayPrefs.bgOpacity;
+      document.querySelector('.logo-wrapper') &&
+        (document.querySelectorAll('.logo-wrapper').forEach(el => {
+          el.style.opacity = overlayPrefs.bgOpacity;
+        }));
+
       getElements('.o-gurbani').setProperty('color', overlayPrefs.gurbaniTextColor);
       getElements('.o-gurbani').setProperty('fontSize',
         `${(preview && overlayPrefs.fitTextSwitch) ? 5 : overlayPrefs.gurbaniSize}vh`);
 
-      if (!preview && ['top', 'bottom'].includes(overlayPrefs.layout)) {
+      getElements('.o-translation').setProperty('fontSize', `${translationSize}vh`);
+      getElements('.o-transliteration').setProperty('fontSize', `${transliterationSize}vh`);
+      getElements('.o-translation').setProperty('color', overlayPrefs.textColor);
+      getElements('.o-transliteration').setProperty('color', overlayPrefs.textColor);
+
+      if (!preview && ['top', 'bottom'].includes(layout)) {
         if (overlayPrefs.fitTextSwitch) {
           fitTextInstances = fitty('.layout-top-bottom .o-gurbani', {
             minSize: 18,
@@ -175,6 +313,7 @@
         'layout-classic',
         'layout-vertical',
         'layout-vertical-left',
+        'layout-fullscreen',
       );
 
       const { gurbaniFont, textFont, toggleAnnouncement } = overlayPrefs;
@@ -182,9 +321,14 @@
       getElements('.o-translation').setProperty('fontFamily', textFont);
       getElements('.o-transliteration').setProperty('fontFamily', textFont);
 
-      document.body.classList.add('layout-' + overlayPrefs.layout);
+      // Hindi/Devanagari keep dedicated font stacks via CSS classes
+      document.querySelectorAll('.o-translation.hindi, .o-transliteration.devanagari').forEach(el => {
+        el.style.fontFamily = '';
+      });
 
-      if (['top', 'bottom'].includes(overlayPrefs.layout)) {
+      document.body.classList.add('layout-' + layout);
+
+      if (['top', 'bottom'].includes(layout)) {
         document.querySelector('.layout-top-bottom').style.display = 'flex';
         document.querySelector('.other-layouts').style.display = 'none';
       } else {
@@ -193,16 +337,32 @@
       }
       document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
 
-      if (toggleAnnouncement) {
-        if (hasAnnouncement && Object.keys(lastAnnouncement).length) {
-          const { text, isGurmukhi, isAnnouncement } = lastAnnouncement;
-          writeText(text, isGurmukhi, isAnnouncement);
-        }
-      } else {
-        if (Object.keys(lineBeforeAnnouncement).length) {
-          const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnouncement;
-          writeLine(Line, larivaar, larivaarAssist, languageSettings);
-        }
+      // Prefer announcement only when one is actively showing; otherwise always
+      // refresh verse content so language / visibility prefs apply immediately.
+      if (
+        toggleAnnouncement &&
+        hasAnnouncement &&
+        Object.keys(lastAnnouncement).length
+      ) {
+        const { text, isGurmukhi, isAnnouncement } = lastAnnouncement;
+        writeText(text, isGurmukhi, isAnnouncement);
+      } else if (Object.keys(lineBeforeAnnouncement).length) {
+        const { Line, larivaar, larivaarAssist, languageSettings } = lineBeforeAnnouncement;
+        const resolvedLanguage = getLanguageSettings(languageSettings);
+        const translationText = getTranslationText(Line, resolvedLanguage.translation);
+        const transliterationText = getTransliterationText(
+          Line,
+          resolvedLanguage.transliteration,
+        );
+
+        getElements('.o-gurbani').setProperty(
+          'innerHTML',
+          assist(Line.Gurmukhi || '', larivaar, larivaarAssist),
+        );
+        getElements('.o-translation').setProperty('innerHTML', translationText);
+        getElements('.o-teeka').setProperty('innerHTML', Line.Punjabi || '');
+        getElements('.o-transliteration').setProperty('innerHTML', transliterationText);
+        applyContentLanguageClasses(resolvedLanguage);
       }
 
       document.querySelectorAll('.content-top, .content-bars-bottom').forEach(el => {
@@ -243,32 +403,41 @@
           document.querySelector('.overlay-wrapper').style.backgroundColor = 'transparent';
         });
 
+      // Fullscreen layout (viewer-like)
+      document.querySelectorAll('.layout-fullscreen .overlay-wrapper').forEach(el => {
+        el.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+        document.querySelectorAll('.content-top, .content-bottom').forEach(content => {
+          content.style.backgroundColor = 'transparent';
+          content.style.padding = '0';
+        });
+      });
+
       document.body.style.backgroundColor = overlayColor;
 
-      const $gurbaniWrapper = document.querySelectorAll('.o-gurbani');
-
-      $gurbaniWrapper.forEach($gurbani => {
-        let line = '';
-        const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-        if ($gurbani.children.length) {
-          line = [...$gurbani.children].map(word => word.innerHTML).join(' ');
-        }
-        $gurbani.innerHTML = assist(line, overlayLarivaar, larivaarAssist);
-      });
-
       // Apply the font weight and italic to translation and transliteration
+      const textFormat = overlayPrefs.textFormat || { bold: false, italic: false };
       document.querySelectorAll('span.o-translation, span.o-transliteration').forEach(el => {
-        el.style.fontWeight = overlayPrefs.textFormat.bold ? 900 : 400;
-        el.style.fontStyle = overlayPrefs.textFormat.italic ? 'italic' : 'normal';
+        const isDevanagari = el.classList.contains('hindi') || el.classList.contains('devanagari');
+        if (isDevanagari) {
+          el.style.fontWeight = 'normal';
+          el.style.fontStyle = textFormat.italic ? 'italic' : 'normal';
+          el.style.fontSynthesis = 'none';
+        } else {
+          el.style.fontWeight = textFormat.bold ? 900 : 400;
+          el.style.fontStyle = textFormat.italic ? 'italic' : 'normal';
+        }
       });
 
+      applyContentVisibility();
     };
 
     socket.on('show-line', request => {
       if (!preview) {
+        const overlayLarivaar = overlayPrefs ? overlayPrefs.overlayLarivaar : false;
+        const larivaarAssist = overlayPrefs ? overlayPrefs.larivaarAssist : false;
+        writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
         if (overlayPrefs) {
-          const { overlayLarivaar, larivaarAssist } = overlayPrefs;
-          writeLine(request.Line, overlayLarivaar, larivaarAssist, request.languageSettings);
+          applyOverlayPrefs();
         }
       }
     });
@@ -290,7 +459,8 @@
     });
 
     socket.on('update-prefs', data => {
-      overlayPrefs = data;
+      // Merge so a partial prefs payload never drops layout / other settings
+      overlayPrefs = { ...(overlayPrefs || {}), ...data };
       applyOverlayPrefs();
     });
   </script>
@@ -301,6 +471,7 @@
     <div class="layout-top-bottom">
       <div class="content-bar ">
         <div><span class="gurmukhi o-gurbani"> </span></div>
+        <div><span class="o-transliteration"> </span></div>
         <div><span class="o-translation"> </span></div>
       </div>
       <div class="logo-wrapper" >

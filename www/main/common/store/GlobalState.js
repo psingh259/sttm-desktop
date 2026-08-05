@@ -9,11 +9,14 @@ import createNavigatorSettingsState from './navigator-settings/create-navigator-
 import { savedSettings, userConfigPath } from './user-settings/get-saved-user-settings';
 import { savedOverlaySettings } from './user-settings/get-saved-overlay-settings';
 
-import createOverlaySettingsState from './user-settings/create-overlay-settings-state';
+import createOverlaySettingsState, {
+  buildOverlayPrefs,
+} from './user-settings/create-overlay-settings-state';
 
 const { sidebar, bottomBar } = require('../../../configs/overlay.json');
 const { settings } = require('../../../configs/user-settings.json');
 const navigatorSettings = require('../../../configs/navigator-settings.json');
+const overlaySettingsSchema = { ...sidebar.settings, ...bottomBar.settings };
 
 global.platform = require('../../desktop_scripts');
 
@@ -92,7 +95,7 @@ const GlobalState = createStore({
   },
   userSettings: createUserSettingsState(settings, savedSettings, userConfigPath),
   baniOverlay: createOverlaySettingsState(
-    { ...sidebar.settings, ...bottomBar.settings },
+    overlaySettingsSchema,
     savedOverlaySettings,
     userConfigPath,
   ),
@@ -100,12 +103,20 @@ const GlobalState = createStore({
 
 global.platform.ipc.on('update-global-setting', (_event, setting) => {
   const { settingType, actionName, payload } = JSON.parse(setting);
-  GlobalState.getActions()[settingType][actionName](payload);
+  const actions = GlobalState.getActions()[settingType];
+  if (!actions || typeof actions[actionName] !== 'function') {
+    return;
+  }
+  actions[actionName](payload);
 });
 
 global.platform.ipc.on('get-overlay-prefs', () => {
   const overlayState = GlobalState.getState().baniOverlay;
-  global.platform.ipc.send('save-overlay-settings', JSON.stringify(overlayState));
+  const prefs = buildOverlayPrefs(overlaySettingsSchema, overlayState);
+  global.platform.ipc.send(
+    'save-overlay-settings',
+    JSON.stringify({ ...prefs, __fullSnapshot: true }),
+  );
 });
 
 global.platform.ipc.on('userToken', (event, data) => {

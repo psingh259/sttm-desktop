@@ -21,20 +21,22 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleSizeIcon = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     const { max, min, step } = settingObj;
     const value = event.currentTarget ? event.currentTarget.dataset.value : event;
-    const currentValue = baniOverlayState[stateVar];
+    const currentValue = Number(baniOverlayState[stateVar]);
     let updatedValue;
 
     if (value === 'plus' && currentValue < max) {
       updatedValue = currentValue + step;
       baniOverlayActions[stateFunction](updatedValue);
     } else if (value === 'minus' && currentValue > min) {
-      updatedValue = baniOverlayState[stateVar] - step;
+      updatedValue = currentValue - step;
       baniOverlayActions[stateFunction](updatedValue);
     }
 
-    if (settingObj?.disableOnChange?.length > 0) {
+    if (updatedValue !== undefined && settingObj?.disableOnChange?.length > 0) {
       settingObj.disableOnChange.forEach((disableSetting) => {
         const disabledSetting = convertToCamelCase(disableSetting);
         const setDisabledSetting = `set${convertToCamelCase(disableSetting, true)}`;
@@ -60,9 +62,11 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
   };
 
   const handleLayoutChange = (event) => {
+    event.stopPropagation();
     const currentLayout = baniOverlayState[stateVar];
-    const newLayout = event.currentTarget.dataset.layout;
-    if (newLayout !== currentLayout) {
+    const layoutEl = event.currentTarget.closest('[data-layout]') || event.currentTarget;
+    const newLayout = layoutEl.dataset.layout;
+    if (newLayout && newLayout !== currentLayout) {
       baniOverlayActions[stateFunction](newLayout);
     }
   };
@@ -105,10 +109,24 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     case 'size-icon':
       settingDOM.push(
         <span className={`size-icon-container`}>
-          <div className="size-icon icon-left" data-value="plus" onClick={handleSizeIcon}>
+          <div
+            className="size-icon icon-left"
+            data-value="plus"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleSizeIcon(event);
+            }}
+          >
             <i className="fa fa-plus"></i>
           </div>
-          <div className="size-icon icon-right" data-value="minus" onClick={handleSizeIcon}>
+          <div
+            className="size-icon icon-right"
+            data-value="minus"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleSizeIcon(event);
+            }}
+          >
             <i className="fa fa-minus"></i>
           </div>
         </span>,
@@ -150,7 +168,7 @@ const OverlaySetting = ({ settingObj, stateVar, stateFunction }) => {
     case 'switch':
       settingDOM.push(
         <Switch
-          controlId={`${title}-switch`}
+          controlId={`${stateVar}-switch`}
           className={`control-item-switch`}
           value={baniOverlayState[stateVar]}
           onToggle={handleToggleChange}
