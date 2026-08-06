@@ -96,7 +96,7 @@
       "advanced-settings": {
         "title": "",
         "type": "switch",
-        "settings": ["fit-text-switch", "toggle-announcement"]
+        "settings": ["fit-text-switch", "toggle-announcement", "hide-overlay-text"]
       }
     },
     "settings": {
@@ -133,6 +133,11 @@
         "title": "MISC_SLIDE_ANNOUNCEMENT",
         "tooltip": "Toggle Announcement",
         "initialValue": true
+      },
+      "hide-overlay-text": {
+        "title": "HIDE_OVERLAY_TEXT",
+        "tooltip": "Hide gurbani and all translations; keep theme background only",
+        "initialValue": false
       },
       "larivaarAssist": {
         "title": "LARIVAAR_ASSIST",

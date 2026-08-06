@@ -555,6 +555,69 @@
           el.style.fontStyle = textFormat.italic ? 'italic' : 'normal';
         }
       });
+
+      // Hide all verse text; keep theme background for custom OBS/browser content
+      applyHideOverlayText(layout, bgOpacity);
+    };
+
+    const applyHideOverlayText = (layout, bgOpacity) => {
+      const hideText = !!overlayPrefs.hideOverlayText;
+      const overlayWrapper = document.querySelector('.overlay-wrapper');
+      document.body.classList.toggle('hide-overlay-text', hideText);
+
+      document.querySelectorAll('.o-gurbani, .o-content-slot').forEach((el) => {
+        if (hideText) {
+          el.style.visibility = 'hidden';
+          // Keep layout flow for bars if needed, but do not show glyphs
+          el.style.opacity = '0';
+        } else {
+          el.style.visibility = '';
+          el.style.opacity = '';
+        }
+      });
+
+      // Always hide logo when text is hidden (clean background canvas)
+      if (hideText) {
+        document.body.classList.add('logo-off');
+      }
+
+      if (!overlayWrapper) return;
+
+      if (hideText) {
+        // Full theme background canvas for any layout
+        overlayWrapper.hidden = false;
+        overlayWrapper.style.display = 'block';
+        overlayWrapper.style.position = 'fixed';
+        overlayWrapper.style.left = '0';
+        overlayWrapper.style.top = '0';
+        overlayWrapper.style.right = '0';
+        overlayWrapper.style.bottom = '0';
+        overlayWrapper.style.width = '100%';
+        overlayWrapper.style.height = '100%';
+        overlayWrapper.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+
+        // Hide layout chrome; background is on the wrapper
+        document.querySelectorAll('.layout-top-bottom, .other-layouts').forEach((el) => {
+          el.style.visibility = 'hidden';
+        });
+      } else {
+        document.querySelectorAll('.layout-top-bottom, .other-layouts').forEach((el) => {
+          el.style.visibility = '';
+        });
+        // Clear forced full-canvas styles; layout rules re-apply on next pass
+        if (layout !== 'fullscreen' && layout !== 'vertical' && layout !== 'vertical-left') {
+          overlayWrapper.style.position = '';
+          overlayWrapper.style.left = '';
+          overlayWrapper.style.top = '';
+          overlayWrapper.style.right = '';
+          overlayWrapper.style.bottom = '';
+          overlayWrapper.style.width = '';
+          overlayWrapper.style.height = '';
+          if (layout !== 'classic') {
+            overlayWrapper.style.backgroundColor = 'transparent';
+          }
+        }
+      }
     };
 
     socket.on('show-line', (request) => {
