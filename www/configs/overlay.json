@@ -96,7 +96,7 @@
       "advanced-settings": {
         "title": "",
         "type": "switch",
-        "settings": ["fit-text-switch", "toggle-announcement", "hide-overlay-text"]
+        "settings": ["fit-text-switch", "toggle-announcement"]
       }
     },
     "settings": {

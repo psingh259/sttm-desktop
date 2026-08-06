@@ -509,6 +509,9 @@
   "SHABAD_PANE": {
     "SHOW_DISPLAY": "Show Display",
     "HIDE_SCREEN": "Hide Display",
+    "HIDE_OVERLAY_TEXT": "Hide Overlay Text",
+    "SHOW_OVERLAY_TEXT": "Show Overlay Text",
+    "HIDE_OVERLAY_TEXT_TOOLTIP": "Hides gurbani and all translations on the Bani Overlay browser link, keeping only the theme background so you can add custom text in OBS/browser.",
     "MARK_FAV": "Add to favorites",
     "UNMARK_FAV": "Remove from favorites",
     "FAV_BTN_TOOLTIP": "Add or remove the current displayed Shabad to your list of favorites. Your favorites are available under the tabs in the bottom right hand panel.",

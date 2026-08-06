@@ -58,10 +58,20 @@
       margin-right: 12px;
       position: relative;
 
-      img {
+      img,
+      > i {
         width: 0.9rem;
         height: auto;
         margin-right: 8px;
+      }
+
+      > i {
+        font-size: 0.9rem;
+      }
+
+      p {
+        margin: 0;
+        white-space: nowrap;
       }
 
       &:hover {
@@ -72,6 +82,11 @@
         background-color: $red;
         color: white;
         animation: pulse-border 3s infinite, blink-btn 3s infinite;
+      }
+
+      &.toggle-overlay-text-btn {
+        width: auto;
+        min-width: 150px;
       }
     }
 

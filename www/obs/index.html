@@ -561,22 +561,23 @@
     };
 
     const applyHideOverlayText = (layout, bgOpacity) => {
-      const hideText = !!overlayPrefs.hideOverlayText;
+      const hideText = overlayPrefs.hideOverlayText === true || overlayPrefs.hideOverlayText === 'true';
       const overlayWrapper = document.querySelector('.overlay-wrapper');
       document.body.classList.toggle('hide-overlay-text', hideText);
 
+      // Hard-hide all verse text nodes (works on live browser + preview)
       document.querySelectorAll('.o-gurbani, .o-content-slot').forEach((el) => {
         if (hideText) {
-          el.style.visibility = 'hidden';
-          // Keep layout flow for bars if needed, but do not show glyphs
-          el.style.opacity = '0';
+          el.style.setProperty('display', 'none', 'important');
+          el.style.setProperty('visibility', 'hidden', 'important');
+          el.style.setProperty('opacity', '0', 'important');
         } else {
-          el.style.visibility = '';
-          el.style.opacity = '';
+          el.style.removeProperty('display');
+          el.style.removeProperty('visibility');
+          el.style.removeProperty('opacity');
         }
       });
 
-      // Always hide logo when text is hidden (clean background canvas)
       if (hideText) {
         document.body.classList.add('logo-off');
       }
@@ -584,39 +585,55 @@
       if (!overlayWrapper) return;
 
       if (hideText) {
-        // Full theme background canvas for any layout
+        // Full theme background canvas for any layout (live OBS/browser link)
         overlayWrapper.hidden = false;
-        overlayWrapper.style.display = 'block';
-        overlayWrapper.style.position = 'fixed';
-        overlayWrapper.style.left = '0';
-        overlayWrapper.style.top = '0';
-        overlayWrapper.style.right = '0';
-        overlayWrapper.style.bottom = '0';
-        overlayWrapper.style.width = '100%';
-        overlayWrapper.style.height = '100%';
-        overlayWrapper.style.backgroundColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`;
+        overlayWrapper.style.setProperty('display', 'block', 'important');
+        overlayWrapper.style.setProperty('position', 'fixed', 'important');
+        overlayWrapper.style.setProperty('left', '0', 'important');
+        overlayWrapper.style.setProperty('top', '0', 'important');
+        overlayWrapper.style.setProperty('right', '0', 'important');
+        overlayWrapper.style.setProperty('bottom', '0', 'important');
+        overlayWrapper.style.setProperty('width', '100%', 'important');
+        overlayWrapper.style.setProperty('height', '100%', 'important');
+        overlayWrapper.style.setProperty(
+          'background-color',
+          `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`,
+          'important',
+        );
 
-        // Hide layout chrome; background is on the wrapper
-        document.querySelectorAll('.layout-top-bottom, .other-layouts').forEach((el) => {
-          el.style.visibility = 'hidden';
+        document.querySelectorAll('.layout-top-bottom, .other-layouts, .logo-wrapper').forEach((el) => {
+          el.style.setProperty('display', 'none', 'important');
         });
       } else {
-        document.querySelectorAll('.layout-top-bottom, .other-layouts').forEach((el) => {
-          el.style.visibility = '';
+        document.querySelectorAll('.layout-top-bottom, .other-layouts, .logo-wrapper').forEach((el) => {
+          el.style.removeProperty('display');
         });
-        // Clear forced full-canvas styles; layout rules re-apply on next pass
-        if (layout !== 'fullscreen' && layout !== 'vertical' && layout !== 'vertical-left') {
-          overlayWrapper.style.position = '';
-          overlayWrapper.style.left = '';
-          overlayWrapper.style.top = '';
-          overlayWrapper.style.right = '';
-          overlayWrapper.style.bottom = '';
-          overlayWrapper.style.width = '';
-          overlayWrapper.style.height = '';
-          if (layout !== 'classic') {
-            overlayWrapper.style.backgroundColor = 'transparent';
-          }
+        // Clear forced full-canvas styles so normal layout CSS/JS can apply
+        [
+          'display',
+          'position',
+          'left',
+          'top',
+          'right',
+          'bottom',
+          'width',
+          'height',
+          'background-color',
+        ].forEach((prop) => overlayWrapper.style.removeProperty(prop));
+
+        // Restore active layout containers
+        if (['top', 'bottom'].includes(layout)) {
+          const topBottom = document.querySelector('.layout-top-bottom');
+          const other = document.querySelector('.other-layouts');
+          if (topBottom) topBottom.style.display = 'flex';
+          if (other) other.style.display = 'none';
+        } else {
+          const topBottom = document.querySelector('.layout-top-bottom');
+          const other = document.querySelector('.other-layouts');
+          if (other) other.style.display = 'block';
+          if (topBottom) topBottom.style.display = 'none';
         }
+        document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
       }
     };
 
@@ -624,6 +641,7 @@
       if (!preview) {
         const overlayLarivaar = overlayPrefs ? overlayPrefs.overlayLarivaar : false;
         const larivaarAssist = overlayPrefs ? overlayPrefs.larivaarAssist : false;
+        // Always store the line; applyOverlayPrefs enforces hide-overlay-text if on
         writeLine(request.Line, overlayLarivaar, larivaarAssist);
         if (overlayPrefs) {
           applyOverlayPrefs();
