@@ -31,6 +31,7 @@
     "BACKGROUND": "Background",
     "PADDING": "Padding",
     "SPACING": "Spacing",
+    "ZOOM": "Zoom",
     "PADDING_HORIZONTAL": "Horizontal",
     "PADDING_VERTICAL": "Vertical",
     "LINE_SPACING": "Line spacing",

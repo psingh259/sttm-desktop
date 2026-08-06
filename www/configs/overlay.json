@@ -61,7 +61,7 @@
       "spacing-options": {
         "title": "",
         "type": "size-icon",
-        "settings": ["padding-horizontal", "padding-vertical", "line-spacing"]
+        "settings": ["overlay-zoom", "padding-horizontal", "padding-vertical", "line-spacing"]
       },
 
       "larivaar-title": {
@@ -273,6 +273,15 @@
         "max": 8,
         "min": 0,
         "step": 0.1
+      },
+      "overlay-zoom": {
+        "title": "ZOOM",
+        "type": "size-icon",
+        "initialValue": 1,
+        "max": 3,
+        "min": 0.4,
+        "step": 0.1,
+        "disableOnChange": ["fit-text-switch"]
       },
       "padding-horizontal": {
         "title": "PADDING_HORIZONTAL",
