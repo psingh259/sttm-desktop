@@ -48,7 +48,8 @@ body {
 .content-bar {
   left: 0;
   margin: auto;
-  padding: 0 3vw;
+  // Side padding comes from overlay spacing prefs (inline), not fixed CSS
+  padding: 0;
   position: relative;
   text-align: center;
   width: 100%;
@@ -113,11 +114,7 @@ body {
 }
 
 .layout-top {
-  .o-gurbani,
-  .o-content-slot {
-    padding: 0.5% 3vw;
-  }
-
+  // Horizontal/vertical padding is applied via inline styles from overlay prefs
   .logo-wrapper {
     bottom: 2vh;
   }
@@ -129,11 +126,7 @@ body {
     position: absolute;
   }
 
-  .o-gurbani,
-  .o-content-slot {
-    padding: 0.5% 3vw;
-  }
-
+  // Horizontal/vertical padding is applied via inline styles from overlay prefs
   .logo-wrapper {
     top: 2vh;
   }

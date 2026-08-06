@@ -257,13 +257,21 @@
           : legacy;
       const lineSpacing =
         overlayPrefs.lineSpacing != null ? Number(overlayPrefs.lineSpacing) : 0.5;
-      return { horizontal, vertical, lineSpacing };
+      return {
+        horizontal: Number.isFinite(horizontal) ? horizontal : 5,
+        vertical: Number.isFinite(vertical) ? vertical : 0.5,
+        lineSpacing: Number.isFinite(lineSpacing) ? lineSpacing : 0.5,
+      };
     };
 
     const applySpacing = (layout) => {
       const { horizontal, vertical, lineSpacing } = getSpacing();
-      const padY = overlayPrefs.fitTextSwitch ? 1 : vertical;
-      const padX = overlayPrefs.fitTextSwitch ? 5 : horizontal;
+      // Only force compact padding for fit-text on top/bottom subtitle layouts.
+      // Never lock spacing on split/fullscreen/classic/vertical (live browser).
+      const useFitTextPad =
+        !!overlayPrefs.fitTextSwitch && ['top', 'bottom'].includes(layout);
+      const padY = useFitTextPad ? 1 : vertical;
+      const padX = useFitTextPad ? 5 : horizontal;
       const boxPadding = `${padY}vh ${padX}%`;
 
       const layoutContainer = document.querySelector('.layout-top-bottom');
@@ -272,14 +280,28 @@
       const contentBars = document.querySelectorAll('.content-bar');
 
       // Clear previous spacing / CSS defaults so controls are authoritative
-      layoutContainer.style.padding = '0';
+      if (layoutContainer) {
+        layoutContainer.style.padding = '0';
+        layoutContainer.style.paddingTop = '0';
+        layoutContainer.style.paddingBottom = '0';
+        layoutContainer.style.paddingLeft = '0';
+        layoutContainer.style.paddingRight = '0';
+      }
       contentPanels.forEach((el) => {
         el.style.padding = '0';
       });
       contentBars.forEach((el) => {
         el.style.padding = '0';
       });
-      if (overlayWrapper) overlayWrapper.style.padding = '0';
+      if (overlayWrapper) {
+        overlayWrapper.style.padding = '0';
+        // Reset classic positioning overrides between layout switches
+        if (layout !== 'classic') {
+          overlayWrapper.style.left = '';
+          overlayWrapper.style.width = '';
+          overlayWrapper.style.bottom = '';
+        }
+      }
       document.querySelectorAll('.o-gurbani, .o-content-slot').forEach((el) => {
         el.style.marginTop = '0';
         el.style.marginBottom = '0';
@@ -304,21 +326,35 @@
       }
 
       if (['top', 'bottom'].includes(layout)) {
-        layoutContainer.style.padding = boxPadding;
+        if (layoutContainer) {
+          layoutContainer.style.paddingTop = `${padY}vh`;
+          layoutContainer.style.paddingBottom = `${padY}vh`;
+          layoutContainer.style.paddingLeft = `${padX}%`;
+          layoutContainer.style.paddingRight = `${padX}%`;
+        }
       } else if (layout === 'split') {
         contentPanels.forEach((el) => {
-          el.style.padding = boxPadding;
+          el.style.paddingTop = `${padY}vh`;
+          el.style.paddingBottom = `${padY}vh`;
+          el.style.paddingLeft = `${padX}%`;
+          el.style.paddingRight = `${padX}%`;
         });
       } else if (layout === 'fullscreen') {
         if (overlayWrapper) {
-          overlayWrapper.style.padding = `${padY}vh ${padX}%`;
+          overlayWrapper.style.paddingTop = `${padY}vh`;
+          overlayWrapper.style.paddingBottom = `${padY}vh`;
+          overlayWrapper.style.paddingLeft = `${padX}%`;
+          overlayWrapper.style.paddingRight = `${padX}%`;
+          overlayWrapper.style.boxSizing = 'border-box';
         }
         contentPanels.forEach((el) => {
           el.style.backgroundColor = 'transparent';
+          el.style.padding = '0';
         });
       } else if (layout === 'classic') {
         contentPanels.forEach((el) => {
           el.style.backgroundColor = 'transparent';
+          el.style.padding = '0';
         });
         const overlayBgColor = `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${
           Number(overlayPrefs.greenScreenToggle) || overlayPrefs.bgOpacity
@@ -327,20 +363,26 @@
           activeRoot.querySelectorAll('span.o-gurbani, .o-content-slot').forEach((spanEl) => {
             if (spanEl.style.display === 'none' || !spanEl.innerHTML.trim()) return;
             spanEl.style.backgroundColor = overlayBgColor;
-            spanEl.style.padding = `${Math.max(padY, 0.3)}vh ${Math.max(padX * 0.3, 0.5)}vw`;
+            spanEl.style.paddingTop = `${Math.max(padY, 0.3)}vh`;
+            spanEl.style.paddingBottom = `${Math.max(padY, 0.3)}vh`;
+            spanEl.style.paddingLeft = `${Math.max(padX * 0.3, 0.5)}vw`;
+            spanEl.style.paddingRight = `${Math.max(padX * 0.3, 0.5)}vw`;
             spanEl.style.lineHeight = '1.5em';
           });
         }
-        // Outer inset for classic block
         if (overlayWrapper) {
           overlayWrapper.style.left = `${padX}%`;
           overlayWrapper.style.width = `${Math.max(100 - padX * 2, 40)}%`;
           overlayWrapper.style.bottom = `${Math.max(padY * 2, 4)}%`;
           overlayWrapper.style.backgroundColor = 'transparent';
+          overlayWrapper.style.padding = '0';
         }
       } else if (layout === 'vertical' || layout === 'vertical-left') {
         contentPanels.forEach((el) => {
-          el.style.padding = `${padY}vh ${padX * 0.5}%`;
+          el.style.paddingTop = `${padY}vh`;
+          el.style.paddingBottom = `${padY}vh`;
+          el.style.paddingLeft = `${padX * 0.5}%`;
+          el.style.paddingRight = `${padX * 0.5}%`;
           el.style.backgroundColor = 'transparent';
         });
         document
@@ -349,8 +391,18 @@
           )
           .forEach((el) => {
             el.style.width = `${Math.min(Math.max(padX * 2.5, 25), 70)}%`;
-            el.style.padding = `${padY}vh 0`;
+            el.style.paddingTop = `${padY}vh`;
+            el.style.paddingBottom = `${padY}vh`;
+            el.style.paddingLeft = '0';
+            el.style.paddingRight = '0';
+            el.style.boxSizing = 'border-box';
           });
+      } else {
+        // Fallback: apply box padding to both layout roots
+        if (layoutContainer) layoutContainer.style.padding = boxPadding;
+        contentPanels.forEach((el) => {
+          el.style.padding = boxPadding;
+        });
       }
     };
 
