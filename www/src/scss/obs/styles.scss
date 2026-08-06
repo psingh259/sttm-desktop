@@ -16,7 +16,7 @@ body {
   position: relative;
 }
 
-// Background-only mode: theme fill stays, all verse text is hidden
+// Text hidden, theme/layout backgrounds stay visible
 body.hide-overlay-text {
   .o-gurbani,
   .o-content-slot,

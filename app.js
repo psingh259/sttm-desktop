@@ -805,6 +805,16 @@ ipcMain.on('save-overlay-settings', (event, overlayPrefs) => {
   updateOverlayVars(JSON.parse(overlayPrefs));
 });
 
+// Presentation header toggle: hide/show overlay verse text on live browser URL
+ipcMain.on('toggle-overlay-text', (event, hideText) => {
+  const hide = !!hideText;
+  lastOverlayPrefs = { ...(lastOverlayPrefs || {}), hideOverlayText: hide };
+  // Prefer dedicated event so clients apply immediately even mid-render
+  io.emit('hide-overlay-text', hide);
+  // Also merge into prefs stream for clients that only listen to update-prefs
+  io.emit('update-prefs', lastOverlayPrefs);
+});
+
 ipcMain.on('deleteToken', () => {
   deleteToken();
 });

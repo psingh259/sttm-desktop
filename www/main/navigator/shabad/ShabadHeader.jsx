@@ -15,7 +15,7 @@ const { i18n } = remote.require('./app');
 const ShabadHeader = () => {
   const [showViewer, setShowViewer] = useState(true);
   const { defaultPaneId } = useStoreState((state) => state.userSettings);
-  const hideOverlayText = useStoreState((state) => state.baniOverlay.hideOverlayText);
+  const hideOverlayText = useStoreState((state) => !!state.baniOverlay.hideOverlayText);
   const { setHideOverlayText } = useStoreActions((state) => state.baniOverlay);
 
   useEffect(() => {
@@ -24,15 +24,18 @@ const ShabadHeader = () => {
 
   const toggleOverlayText = () => {
     const nextValue = !hideOverlayText;
-    // Persist in global baniOverlay settings
-    if (typeof setHideOverlayText === 'function') {
-      setHideOverlayText(nextValue);
+
+    // 1) Tell live OBS/browser overlay immediately (dedicated channel)
+    ipcRenderer.send('toggle-overlay-text', nextValue);
+
+    // 2) Persist setting (do not block live emit if this throws)
+    try {
+      if (typeof setHideOverlayText === 'function') {
+        setHideOverlayText(nextValue);
+      }
+    } catch (e) {
+      // ignore persistence errors; live toggle already sent
     }
-    // Push live delta to OBS/browser overlay immediately
-    ipcRenderer.send(
-      'save-overlay-settings',
-      JSON.stringify({ hideOverlayText: nextValue }),
-    );
   };
 
   return (

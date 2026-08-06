@@ -556,85 +556,42 @@
         }
       });
 
-      // Hide all verse text; keep theme background for custom OBS/browser content
-      applyHideOverlayText(layout, bgOpacity);
+      // Hide/show verse text only — never clears theme background
+      applyHideOverlayText();
     };
 
-    const applyHideOverlayText = (layout, bgOpacity) => {
-      const hideText = overlayPrefs.hideOverlayText === true || overlayPrefs.hideOverlayText === 'true';
-      const overlayWrapper = document.querySelector('.overlay-wrapper');
+    // Only toggles verse text visibility. Theme / layout background is never removed.
+    const applyHideOverlayText = () => {
+      if (!overlayPrefs) return;
+      const hideText =
+        overlayPrefs.hideOverlayText === true || overlayPrefs.hideOverlayText === 'true';
+
       document.body.classList.toggle('hide-overlay-text', hideText);
 
-      // Hard-hide all verse text nodes (works on live browser + preview)
       document.querySelectorAll('.o-gurbani, .o-content-slot').forEach((el) => {
         if (hideText) {
-          el.style.setProperty('display', 'none', 'important');
           el.style.setProperty('visibility', 'hidden', 'important');
           el.style.setProperty('opacity', '0', 'important');
+          // Use visibility/opacity so layout + background bars stay painted
         } else {
-          el.style.removeProperty('display');
           el.style.removeProperty('visibility');
           el.style.removeProperty('opacity');
         }
       });
 
-      if (hideText) {
-        document.body.classList.add('logo-off');
-      }
-
-      if (!overlayWrapper) return;
-
-      if (hideText) {
-        // Full theme background canvas for any layout (live OBS/browser link)
-        overlayWrapper.hidden = false;
-        overlayWrapper.style.setProperty('display', 'block', 'important');
-        overlayWrapper.style.setProperty('position', 'fixed', 'important');
-        overlayWrapper.style.setProperty('left', '0', 'important');
-        overlayWrapper.style.setProperty('top', '0', 'important');
-        overlayWrapper.style.setProperty('right', '0', 'important');
-        overlayWrapper.style.setProperty('bottom', '0', 'important');
-        overlayWrapper.style.setProperty('width', '100%', 'important');
-        overlayWrapper.style.setProperty('height', '100%', 'important');
-        overlayWrapper.style.setProperty(
-          'background-color',
-          `rgba(${hexToRgb(overlayPrefs.bgColor)}, ${bgOpacity})`,
-          'important',
-        );
-
-        document.querySelectorAll('.layout-top-bottom, .other-layouts, .logo-wrapper').forEach((el) => {
-          el.style.setProperty('display', 'none', 'important');
-        });
-      } else {
-        document.querySelectorAll('.layout-top-bottom, .other-layouts, .logo-wrapper').forEach((el) => {
-          el.style.removeProperty('display');
-        });
-        // Clear forced full-canvas styles so normal layout CSS/JS can apply
-        [
-          'display',
-          'position',
-          'left',
-          'top',
-          'right',
-          'bottom',
-          'width',
-          'height',
-          'background-color',
-        ].forEach((prop) => overlayWrapper.style.removeProperty(prop));
-
-        // Restore active layout containers
-        if (['top', 'bottom'].includes(layout)) {
-          const topBottom = document.querySelector('.layout-top-bottom');
-          const other = document.querySelector('.other-layouts');
-          if (topBottom) topBottom.style.display = 'flex';
-          if (other) other.style.display = 'none';
+      // Keep logo hidden with text so background stays clean for custom content
+      document.querySelectorAll('.logo-wrapper').forEach((el) => {
+        if (hideText) {
+          el.style.setProperty('visibility', 'hidden', 'important');
+          el.style.setProperty('opacity', '0', 'important');
+        } else if (!overlayPrefs.toggleLogo) {
+          el.style.setProperty('visibility', 'hidden', 'important');
+          el.style.setProperty('opacity', '0', 'important');
         } else {
-          const topBottom = document.querySelector('.layout-top-bottom');
-          const other = document.querySelector('.other-layouts');
-          if (other) other.style.display = 'block';
-          if (topBottom) topBottom.style.display = 'none';
+          el.style.removeProperty('visibility');
+          el.style.removeProperty('opacity');
         }
-        document.body.classList.toggle('logo-off', !overlayPrefs.toggleLogo);
-      }
+      });
     };
 
     socket.on('show-line', (request) => {
@@ -666,6 +623,12 @@
     socket.on('update-prefs', (data) => {
       overlayPrefs = { ...(overlayPrefs || {}), ...data };
       applyOverlayPrefs();
+    });
+
+    // Dedicated event so presentation "Hide Overlay Text" always reaches live browser
+    socket.on('hide-overlay-text', (hideText) => {
+      overlayPrefs = { ...(overlayPrefs || {}), hideOverlayText: !!hideText };
+      applyHideOverlayText();
     });
   </script>
 </head>

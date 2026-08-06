@@ -3,6 +3,7 @@ import { convertToCamelCase } from '../../utils';
 
 // can we change them to import?
 const fs = require('fs');
+const { ipcRenderer } = require('electron');
 
 export const buildOverlayPrefs = (settingsSchema, state) => {
   const prefs = {};
@@ -39,9 +40,12 @@ const createOverlaySettingsState = (settingsSchema, savedSettings, userConfigPat
       updatedSettings.baniOverlay[settingKey] = payload;
       fs.writeFileSync(userConfigPath, JSON.stringify(updatedSettings));
 
-      // Live OBS prefs are emitted from the overlay window (OverlayState) to avoid
-      // races with a stale main-window copy of baniOverlay.layout.
-      // get-overlay-prefs still pushes a full snapshot when requested.
+      // Emit a delta so main-window changes (e.g. Hide Overlay Text) reach live browser
+      try {
+        ipcRenderer.send('save-overlay-settings', JSON.stringify({ [stateVarName]: payload }));
+      } catch (e) {
+        // Overlay secondary window may not always have ipc available the same way
+      }
 
       return state;
     });
